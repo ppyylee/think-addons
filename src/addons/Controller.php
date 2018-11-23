@@ -59,8 +59,7 @@ class Controller extends \think\Controller
     {
         parent::__construct($request);
         // 处理路由参数
-        // $this->request->param('route', '');
-        $param = explode('-', ACTION_NAME);
+        $param = explode('-', $this->request->param('route', ''));
         // 是否自动转换控制器和操作名
         $convert = Config::get('url_convert');
         // 格式化路由的插件位置
@@ -76,7 +75,7 @@ class Controller extends \think\Controller
         Config::set('template.view_path', ADDON_PATH . $this->addon . DS . $view_path . DS);
         $this->config = Config::get('template') ?: $this->config;
         //重置视图
-        $this->view = View::instance(Config::get('template'), Config::get('view_replace_str'));
+        $this->view = $this->view->instance(Config::get('template'), Config::get('view_replace_str'));
     }
 
     /**

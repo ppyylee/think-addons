@@ -20,7 +20,7 @@ use think\Route;
 define('ADDON_PATH', ROOT_PATH . 'addons' . DS);
 
 // 定义路由
-Route::any('addons/exec/:route', "\\think\\addons\\Route@exec");
+Route::any('addons/exec/:route', "\\think\\addons\\Route@execute");
 
 // 如果插件目录不存在则创建
 if (!is_dir(ADDON_PATH)) {
