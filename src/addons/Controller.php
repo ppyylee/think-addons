@@ -57,7 +57,7 @@ class Controller extends \think\Controller
      */
     public function __construct(Request $request = null)
     {
-        parent::__construct($request);
+        $this->request = is_null($request) ? Request::instance() : $request;
         // 处理路由参数
         $param = explode('-', $this->request->param('route', ''));
         // 是否自动转换控制器和操作名
@@ -74,8 +74,7 @@ class Controller extends \think\Controller
         $view_path = Config::get('template.view_path') ?: 'view';
         Config::set('template.view_path', ADDON_PATH . $this->addon . DS . $view_path . DS);
         $this->config = Config::get('template') ?: $this->config;
-        //重置视图
-        $this->view = $this->view->instance(Config::get('template'), Config::get('view_replace_str'));
+        parent::__construct($request);
     }
 
     /**
