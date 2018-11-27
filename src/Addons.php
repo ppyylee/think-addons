@@ -32,9 +32,8 @@ abstract class Addons
     protected $error;
 
 
-    public $info = [];
-    public $addons_path = '';
-    public $config_file = '';
+    protected $info = [];
+
 
     /**
      * Construct
@@ -43,56 +42,22 @@ abstract class Addons
     public function __construct()
     {
         // 获取当前插件目录
-        $this->addons_path = ADDON_PATH . $this->getName() . DS;
+        $addons_path = ADDON_PATH . $this->getName() . DS;
         // 读取当前插件配置信息
-        if (is_file($this->addons_path . 'config.php')) {
-            $this->config_file = $this->addons_path . 'config.php';
-            Config::load($this->config_file);
+        if (is_file($addons_path . 'config.php')) {
+            $config_file = $addons_path . 'config.php';
+            Config::load($config_file);
         }
-
         // 初始化视图模型
-        //$config['view_path'] = $this->addons_path;
-        //$config = array_merge(Config::get('template'), $config);
-        //$this->view = new View($config, ['__STATIC__' => '/view/']);
-        // 控制器初始化
+        $config['view_path'] = $addons_path;
+        $config = array_merge(Config::get('template'), $config);
+        $this->view = new View($config, Config::get('view_str_replace'));
         if (method_exists($this, '_initialize')) {
             $this->_initialize();
         }
     }
 
-    /**
-     * 获取插件的配置数组
-     * @param string $name 可选模块名
-     * @return array|mixed|null
-     */
-    final public function getConfig($name = '')
-    {
-        static $_config = array();
-        if (empty($name)) {
-            $name = $this->getName();
-        }
-        if (isset($_config[$name])) {
-            return $_config[$name];
-        }
-        $map['name'] = $name;
-        $map['status'] = 1;
-        $config = [];
-        $temp_arr = include $this->config_file;
-        foreach ($temp_arr as $key => $value) {
-            if ($value['type'] == 'group') {
-                foreach ($value['options'] as $gkey => $gvalue) {
-                    foreach ($gvalue['options'] as $ikey => $ivalue) {
-                        $config[$ikey] = $ivalue['value'];
-                    }
-                }
-            } else {
-                $config[$key] = $temp_arr[$key]['value'];
-            }
-        }
-        unset($temp_arr);
-        $_config[$name] = $config;
-        return $config;
-    }
+
 
     /**
      * 获取当前模块名
@@ -193,9 +158,13 @@ abstract class Addons
         return $this->error;
     }
 
-    //必须实现安装
+    /**
+     * 安装
+     */
     abstract public function install();
 
-    //必须卸载插件方法
+    /**
+     * 卸载
+     */
     abstract public function uninstall();
 }
