@@ -34,6 +34,8 @@ abstract class Addons
 
     protected $info = [];
 
+    protected $addons_path;
+
 
     /**
      * Construct
@@ -42,14 +44,14 @@ abstract class Addons
     public function __construct()
     {
         // 获取当前插件目录
-        $addons_path = ADDON_PATH . $this->getName() . DS;
+        $this->addons_path = ADDON_PATH . $this->getName() . DS;
         // 读取当前插件配置信息
-        if (is_file($addons_path . 'config.php')) {
-            $config_file = $addons_path . 'config.php';
+        $config_file = $this->addons_path . 'config.php';
+        if (is_file( $config_file)) {
             Config::load($config_file);
         }
         // 初始化视图模型
-        $config['view_path'] = $addons_path;
+        $config['view_path'] = $this->addons_path;
         $config = array_merge(Config::get('template'), $config);
         $this->view = new View($config, Config::get('view_str_replace'));
         if (method_exists($this, '_initialize')) {
