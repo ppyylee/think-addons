@@ -22,6 +22,10 @@ define('ADDON_PATH', ROOT_PATH . 'addons' . DS);
 // 定义路由
 Route::any('addons/exec/:route', "\\think\\addons\\Route@execute");
 
+\think\Console::addDefaultCommands([
+    "think\\addons\\command\\Build",
+]);
+
 // 如果插件目录不存在则创建
 if (!is_dir(ADDON_PATH)) {
     @mkdir(ADDON_PATH, 0777, true);

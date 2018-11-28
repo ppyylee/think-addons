@@ -19,17 +19,11 @@ use think\console\Output;
 class Build extends Command
 {
 
-    protected function initialize(Input $input, Output $output)
-    {
-
-    }
-
     protected function configure()
     {
 
         $this->setName('addons:build')
-            ->addOption('addons', null, Option::VALUE_REQUIRED, 'The addon to build')
-            ->addOption('all', null, Option::VALUE_IS_ARRAY, 'Retrieve all addons to build',[])
+            ->addOption('addons', null, Option::VALUE_REQUIRED, 'The addons to build')
             ->addOption('install', null, Option::VALUE_NONE, 'Build addons and install it')
             ->addOption('uninstall', null, Option::VALUE_NONE, 'uninstall addons')
             ->setDescription('Addons ready to build');
@@ -44,20 +38,25 @@ class Build extends Command
     public function execute(Input $input, Output $output)
     {
         $addons = $input->getOption('addons');
-        $all = $input->getOption('all');
         $install = $input->getOption('install');
         $uninstall = $input->getOption('uninstall');
         $install_action = 'build';
         if($install && $uninstall){
-            //输出错误
+            $this->output(2,'Option install and uninstall must be used separately');
+            die;
         }
         $install  && $install_action = 'install';
         $uninstall  && $install_action = 'uninstall';
-        if($all && is_array($all)){
-            $this->buildAll($all,$install_action);
-        }elseif ($addons){
-            $this->build($addons,$install_action);
+
+        try {
+            if ($addons){
+                $this->build($addons,$install_action);
+            }
+        } catch (Exception $e) {
+            $this->output(0,var_export($e));
         }
+
+        $this->output(1,'Addons '.$install_action.' success: '.$addons);
 
     }
 
@@ -65,24 +64,38 @@ class Build extends Command
          if(!is_string($addons)){
              $this->output(2,'addons name should be string');
          }
+
+         if(stripos($addons,',')){
+            $addons = array_filter(array_unique(explode(',',$addons)));
+             foreach ($addons as $v){
+                 $this->build($v,$install_action);
+             }
+             die;
+         }
+
          $addons = strtolower($addons);
+        $class = "\\addons\\{$addons}\\{$addons}";
+        if (class_exists($class) && is_subclass_of($class, "\\think\\addons")) {
+            $handler = new $class;
+        }else{
+            $this->output(0,'addons class '.$addons.'  not exsists');
+            die;
+        }
+
         switch ($install_action){
             case 'build':
-                $this->output(0,'build'.$addons);
+                $handler->install();
                 break;
             case 'install':
-                $this->output(1,'install'.$addons);
+                $this->output(1,'install '.$addons);
                 break;
             case 'uninstall':
-                $this->output(2,'addons uninstall'.$addons);
+                $this->output(2,'addons uninstall '.$addons);
                 break;
         }
 
     }
 
-    protected function buildAll($all,$install_action){
-
-    }
 
 
     protected function output($status,$info){
