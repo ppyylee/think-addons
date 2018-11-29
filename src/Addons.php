@@ -161,6 +161,10 @@ abstract class Addons
     }
 
     /**
+     * 创建
+     */
+    abstract public function build();
+    /**
      * 安装
      */
     abstract public function install();

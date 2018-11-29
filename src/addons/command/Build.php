@@ -15,6 +15,7 @@ use think\console\Command;
 use think\console\Input;
 use think\console\input\Option;
 use think\console\Output;
+use think\Exception;
 
 class Build extends Command
 {
@@ -49,24 +50,26 @@ class Build extends Command
         $uninstall  && $install_action = 'uninstall';
 
         try {
-            if ($addons){
-                $this->build($addons,$install_action);
+            if (!$addons){
+                $this->output(2,'try use option `addons` as `--addons`  ');
             }
+            $this->build($addons,$install_action);
         } catch (Exception $e) {
             $this->output(0,var_export($e));
         }
 
-        $this->output(1,'Addons '.$install_action.' success: '.$addons);
+
 
     }
 
     protected function build($addons,$install_action){
          if(!is_string($addons)){
              $this->output(2,'addons name should be string');
+             die;
          }
 
          if(stripos($addons,',')){
-            $addons = array_filter(array_unique(explode(',',$addons)));
+            $addons = array_filter(array_unique(explode(',',$addons),SORT_STRING));
              foreach ($addons as $v){
                  $this->build($v,$install_action);
              }
@@ -84,16 +87,17 @@ class Build extends Command
 
         switch ($install_action){
             case 'build':
-                $handler->install();
+                $handler->build();
                 break;
             case 'install':
-                $this->output(1,'install '.$addons);
+                $handler->build();
+                $handler->install();
                 break;
             case 'uninstall':
-                $this->output(2,'addons uninstall '.$addons);
+                $handler->uninstall();
                 break;
         }
-
+        $this->output(1,'Addons '.$install_action.' success: '.$addons);
     }
 
 
