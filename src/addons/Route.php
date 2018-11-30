@@ -8,7 +8,7 @@
 // +----------------------------------------------------------------------
 // | Author: L1PY <642188573@qq.com>
 // +----------------------------------------------------------------------
-namespace think\addons\command;
+namespace think\addons;
 
 use think\Hook;
 use think\Request;

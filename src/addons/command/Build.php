@@ -77,7 +77,7 @@ class Build extends Command
          }
 
          $addons = strtolower($addons);
-        $class = "\\addons\\{$addons}\\{$addons}";
+        $class = "\\addons\\{$addons}\\".ucfirst($addons);
         if (class_exists($class) && is_subclass_of($class, "\\think\\addons")) {
             $handler = new $class;
         }else{
