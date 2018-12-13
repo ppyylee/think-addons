@@ -57,16 +57,19 @@ class Controller extends \think\Controller
      */
     public function __construct(Request $request = null)
     {
-        parent::__construct($request);
+        $this->request = is_null($request) ? Request::instance() : $request;
         // 处理路由参数
-        // $this->request->param('route', '');
-        $param = explode('-', ACTION_NAME);
+        $param = explode('-', $this->request->param('route', ''));
         // 是否自动转换控制器和操作名
         $convert = Config::get('url_convert');
         // 格式化路由的插件位置
         $this->action = $convert ? strtolower(array_pop($param)) : array_pop($param);
         $this->controller = $convert ? strtolower(array_pop($param)) : array_pop($param);
         $this->addon = $convert ? strtolower(array_pop($param)) : array_pop($param);
+
+        //验证是否安装
+        !file_exists(ADDON_PATH . $this->addon . DS .'install.lock') && abort(404);
+
         //加载插件配置信息
         $config_file = ADDON_PATH . $this->addon . DS .'config.php';
         if (is_file($config_file)) {
@@ -75,8 +78,7 @@ class Controller extends \think\Controller
         $view_path = Config::get('template.view_path') ?: 'view';
         Config::set('template.view_path', ADDON_PATH . $this->addon . DS . $view_path . DS);
         $this->config = Config::get('template') ?: $this->config;
-        //重置视图
-        $this->view = View::instance(Config::get('template'), Config::get('view_replace_str'));
+        parent::__construct($request);
     }
 
     /**

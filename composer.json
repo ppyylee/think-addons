@@ -3,14 +3,13 @@
     "description": "Simple Addons Package For TP5",
     "homepage": "https://github.com/ppyylee/think-addons",
     "license": "Apache-2.0",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "authors": [
         {
             "name": "L1PY",
             "email": "642188573@qq.com"
         }
     ],
-    "minimum-stability": "dev",
     "support": {
         "issues": "https://github.com/ppyylee/think-addons/issues"
     },
@@ -21,7 +20,7 @@
     },
     "autoload": {
         "psr-4": {
-            "think\\": "src/"
+            "think\\": "src"
         },
         "files": [
             "src/common.php"

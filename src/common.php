@@ -20,7 +20,11 @@ use think\Route;
 define('ADDON_PATH', ROOT_PATH . 'addons' . DS);
 
 // 定义路由
-Route::any('addons/exec/:route', "\\think\\addons\\Route@exec");
+Route::any('addons/exec/:route', "\\think\\addons\\Route@execute");
+
+\think\Console::addDefaultCommands([
+    "think\\addons\\command\\Build",
+]);
 
 // 如果插件目录不存在则创建
 if (!is_dir(ADDON_PATH)) {
@@ -141,21 +145,6 @@ function get_addon_class($name, $type = 'hook', $class = null)
     return class_exists($namespace) ? $namespace : '';
 }
 
-/**
- * 获取插件类的配置文件数组
- * @param string $name 插件名
- * @return array
- */
-function get_addon_config($name)
-{
-    $class = get_addon_class($name);
-    if (class_exists($class)) {
-        $addon = new $class();
-        return $addon->getConfig();
-    } else {
-        return [];
-    }
-}
 
 /**
  * 插件显示内容里生成访问插件的url
@@ -168,7 +157,7 @@ function get_addon_config($name)
 function aurl($url, $param = [], $suffix = true, $domain = false)
 {
     $url = parse_url($url);
-    $case = config('url_convert');
+    $case = Config::get('url_convert');
     $addons = $case ? Loader::parseName($url['scheme']) : $url['scheme'];
     $controller = $case ? Loader::parseName($url['host']) : $url['host'];
     $action = trim($case ? strtolower($url['path']) : $url['path'], '/');
