@@ -106,7 +106,7 @@ Simple Addons
     return [
         'autoload'=>true,  //自动加载钩子（debug模式）
             'hooks'=>[     //当autoload为false时，加载hooks中的钩子
-                'wapadminHook'
+                'wapadminHook'=>'addonsone' //key为钩子函数，value为对应的插件，多插件可用数组
             ]
     ];
     ```
