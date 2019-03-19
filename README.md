@@ -71,9 +71,10 @@ Simple Addons
          */
         public  function uninstall()
         {
+            //TODO 更新数据库等
             file_exists($this->addons_path.'install.lock') && unlink($this->addons_path.'install.lock');
     
-            //TODO 更新数据库等
+            
     
         }
 
@@ -99,6 +100,13 @@ Simple Addons
     //    addonsone://admin/index    模块名://控制器名/操作名
     /addons/exec/addonsone-admin-index
     ```
+> 初始化sql `init_sql()`
+
+    ```
+    //用法
+    init_sql($sql_file);
+    //返回包含初始化后的sql语句数组
+    ```
 5. 配置文件 `extra/addons`
 
     ```
@@ -112,10 +120,15 @@ Simple Addons
     ```
     
 6. 命令行模式
-> php think  addons:build 
+> php think  addons:build {options}
 
 ```
+options：
     --addons addonsone   用，分隔多个
     --install  创建后执行安装
     --uninstall  执行卸载
+    
+    php think  addons:build --addons addonsone //创建插件
+    php think  addons:build --addons addonsone --install //创建并安装插件
+    php think  addons:build --addons addonsone --uninstall //卸载插件
 ```

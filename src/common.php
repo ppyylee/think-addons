@@ -170,3 +170,34 @@ function aurl($url, $param = [], $suffix = true, $domain = false)
     $actions = "{$addons}-{$controller}-{$action}";
     return url("addons/exec/{$actions}", $param, $suffix, $domain);
 }
+
+/**
+ * 初始化sql
+ * @param $sql_file
+ * @return array
+ */
+function init_sql($sql_file){
+        $sql = file_get_contents($sql_file);
+        $sql = preg_replace("/TYPE=(InnoDB|MyISAM|MEMORY)( DEFAULT CHARSET=[^; ]+)?/", "ENGINE=\\1 DEFAULT CHARSET=utf8", $sql);
+        $sql = str_replace("\r", "\n", $sql);
+        $ret = array();
+        $queriesArray = explode(";\n", trim($sql));
+        unset($sql);
+        foreach ($queriesArray as $query) {
+            $ret_ = '';
+            $queries = explode("\n", trim($query));
+            $queries = array_filter($queries);
+            foreach ($queries as $query) {
+                $str1 = substr($query, 0, 1);
+                if ($str1 != '#' && $str1 != '-')
+                    $ret_ .= $query;
+            }
+            $ret_ = trim($ret_);
+            if (strstr($ret_, 'CREATE TABLE')) {
+                preg_match('/CREATE TABLE `([^ \(]*)`/', $ret_, $matches);
+                $ret[] = "DROP TABLE IF EXISTS `{$matches[1]}`";
+            }
+            $ret[] = $ret_;
+        }
+        return $ret;
+}
